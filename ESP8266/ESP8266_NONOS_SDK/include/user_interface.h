@@ -630,4 +630,10 @@ void wifi_unregister_user_ie_manufacturer_recv_cb(void);
 void wifi_enable_gpio_wakeup(uint32 i, GPIO_INT_TYPE intr_status);
 void wifi_disable_gpio_wakeup(void);
 
+
+#define START_TIMER(timer, func, time) \
+	os_timer_disarm(&timer); \
+	os_timer_setfn(&timer, (os_timer_func_t *)func, NULL);\
+	os_timer_arm(&timer, time, 0);
+
 #endif

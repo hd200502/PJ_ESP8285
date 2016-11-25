@@ -50,6 +50,19 @@ extern "C"
 #define MASTER_WRITE_DATA_TO_SLAVE_CMD                      2
 #define MASTER_READ_DATA_FROM_SLAVE_CMD                     3
 
+typedef enum
+{
+	SPI_SIG_MOSI  ,
+	SPI_SIG_MISO  ,
+	SPI_SIG_STATUS_R_IN_WR ,
+	SPI_SIG_STATUS_W  ,
+	SPI_SIG_TR_DONE_ALONE  ,
+	SPI_SIG_WR_RD ,
+	SPI_SIG_DATA_ERROR ,
+	SPI_SIG_STATUS_R_IN_RD,
+	SPI_SIG_TEST_CMD
+}SPI_SIG_ENUM;
+
 #define MASTER_WRITE_STATUS_TO_SLAVE_CMD                    1
 #define MASTER_READ_STATUS_FROM_SLAVE_CMD                   4
 
