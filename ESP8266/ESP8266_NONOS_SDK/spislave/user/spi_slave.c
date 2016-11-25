@@ -222,7 +222,7 @@ void ICACHE_FLASH_ATTR _spi_slave_init()
     WRITE_PERI_REG(SPI_WR_STATUS(SpiNum_HSPI), 0x83);
 }
 
-void spi_interface_test(void)
+void spi_interface_init(void)
 {
     // Test spi interfaces.
     os_printf("\r\n =======================================================\r\n");

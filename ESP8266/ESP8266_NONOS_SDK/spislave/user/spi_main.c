@@ -23,7 +23,7 @@
  */
 //#include "ets_sys.h"
 #include "osapi.h"
-#include "spi_test.h"
+#include "spi_main.h"
 #include "user_interface.h"
 //#include "os_type.h"
 #include "mem.h"
@@ -233,7 +233,7 @@ void ICACHE_FLASH_ATTR user_init(void)
 	os_memset(&SpiInfo, 0, sizeof(SpiInfo));
 
     os_printf("compile time:%s %s %s",__DATE__,__TIME__, __FUNCTION__);
-    spi_interface_test();
+    spi_interface_init();
 
 	os_printf("spi task init \n\r");
 	spi_task_init();

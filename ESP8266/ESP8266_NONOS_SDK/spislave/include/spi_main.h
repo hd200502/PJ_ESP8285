@@ -43,7 +43,7 @@ extern "C"
  *
  * @return void.
  */
-void spi_interface_test(void);
+void spi_interface_init(void);
 
 #ifdef __cplusplus
 }
