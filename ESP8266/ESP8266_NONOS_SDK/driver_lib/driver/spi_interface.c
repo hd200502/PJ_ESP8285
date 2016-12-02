@@ -448,7 +448,7 @@ void SPIIntCfg(SpiNum spiNum, SpiIntInfo *pIntInfo)
     // Clear the interrupt source and disable all of the interrupt.
     CLEAR_PERI_REG_MASK(SPI_SLAVE(spiNum), 0x3FF);
     SPIIntEnable(spiNum, pIntInfo->src);
-    os_printf("src=%x\r\n,isrFunc=%x", (pIntInfo->src << 5), pIntInfo->isrFunc);
+    os_printf("src=%x,isrFunc=%x.\r\n", (pIntInfo->src << 5), pIntInfo->isrFunc);
     //
     ETS_SPI_INTR_ATTACH(pIntInfo->isrFunc, NULL);
     // Enable isr

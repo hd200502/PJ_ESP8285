@@ -93,28 +93,29 @@ void spi_slave_isr_sta(void *para)
 
         if (regvalue & SPI_SLV_WR_BUF_DONE) 
 		{
-			uint16 i;
+			uint8 i, idx=spi_idx;
             // User can get data from the W0~W7
 			//os_printf("spi_slave_isr_sta : SPI_SLV_WR_BUF_DONE\n\r");
+			GPIO_OUTPUT_SET(0, 0); // GPIO0 set 0
 			for(i=0; i<8; i++)
 			{
 				uint32 recv_data=READ_PERI_REG(SPI_W0(SpiNum_HSPI)+(i<<2));
-				spi_data[spi_idx][i<<2] = recv_data&0xff;
-				spi_data[spi_idx][(i<<2)+1] = (recv_data>>8)&0xff;
-				spi_data[spi_idx][(i<<2)+2] = (recv_data>>16)&0xff;
-				spi_data[spi_idx][(i<<2)+3] = (recv_data>>24)&0xff;
+				spi_data[idx][i<<2] = recv_data&0xff;
+				spi_data[idx][(i<<2)+1] = (recv_data>>8)&0xff;
+				spi_data[idx][(i<<2)+2] = (recv_data>>16)&0xff;
+				spi_data[idx][(i<<2)+3] = (recv_data>>24)&0xff;
 			}
-			system_os_post(USER_TASK_PRIO_1, (os_signal_t)SPI_SIG_MOSI, (os_param_t)spi_data[spi_idx]);
-			spi_idx++;
-			if (spi_idx >= SPI_DATA_MAX)
-			{
+			system_os_post(USER_TASK_PRIO_1, (os_signal_t)SPI_SIG_MOSI, (os_param_t)spi_data[idx]);
+			if (++spi_idx >= SPI_DATA_MAX)
 				spi_idx=0;
-			}
+
+			GPIO_OUTPUT_SET(0, 1); //GPIO0 set 1
         } 
 		else if (regvalue & SPI_SLV_RD_BUF_DONE)
         {
             // TO DO 
-            os_printf("spi_slave_isr_sta : SPI_SLV_RD_BUF_DONE\n\r");            
+            GPIO_OUTPUT_SET(2, 0); //GPIO2 set 0
+            os_printf("spi_slave_isr_sta : SPI_SLV_RD_BUF_DONE\n\r");
         }
         if (regvalue & SPI_SLV_RD_STA_DONE)
 		{
@@ -158,6 +159,7 @@ void ICACHE_FLASH_ATTR spi_slave_test_send_data()
     sndData[6] = 0x1d1c1b1a;
     sndData[7] = 0x21201f1e;
 
+    GPIO_OUTPUT_SET(2, 1); //GPIO2 set 1
     SPISlaveSendData(SpiNum_HSPI, sndData, 8);
 
     WRITE_PERI_REG(SPI_RD_STATUS(SpiNum_HSPI), 0x8A);
@@ -194,7 +196,7 @@ void ICACHE_FLASH_ATTR _spi_slave_init()
     // Set spi interrupt information.
     SpiIntInfo spiInt;
     spiInt.src = (SpiIntSrc_TransDone 
-        | SpiIntSrc_WrStaDone 
+        |SpiIntSrc_WrStaDone 
         |SpiIntSrc_RdStaDone 
         |SpiIntSrc_WrBufDone 
         |SpiIntSrc_RdBufDone);
