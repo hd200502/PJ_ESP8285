@@ -74,12 +74,13 @@ void spi_slave_isr_sta(void *para)
 {
     uint32 regvalue;
     uint32 statusW, statusR, counter;
-    if (READ_PERI_REG(0x3ff00020)&BIT4)
+    regvalue = READ_PERI_REG(0x3ff00020);
+    if (regvalue&BIT4)
 	{
         //following 3 lines is to clear isr signal
         CLEAR_PERI_REG_MASK(SPI_SLAVE(SpiNum_SPI), 0x3ff);
-    } 
-	else if (READ_PERI_REG(0x3ff00020)&BIT7)
+    }
+    else if (regvalue&BIT7)
     { //bit7 is for hspi isr,
         regvalue = READ_PERI_REG(SPI_SLAVE(SpiNum_HSPI));
         os_printf("spi_slave_isr_sta SPI_SLAVE[0x%08x]\n\r", regvalue);
@@ -110,11 +111,12 @@ void spi_slave_isr_sta(void *para)
 				spi_idx=0;
 
 			GPIO_OUTPUT_SET(0, 1); //GPIO0 set 1
-        } 
+        }
 		else if (regvalue & SPI_SLV_RD_BUF_DONE)
         {
             // TO DO 
             GPIO_OUTPUT_SET(2, 0); //GPIO2 set 0
+			system_os_post(USER_TASK_PRIO_1, (os_signal_t)SPI_SIG_MISO, (os_param_t)NULL);
             os_printf("spi_slave_isr_sta : SPI_SLV_RD_BUF_DONE\n\r");
         }
         if (regvalue & SPI_SLV_RD_STA_DONE)
@@ -141,6 +143,16 @@ void spi_slave_isr_sta(void *para)
         }
         //SHOWSPIREG(SpiNum_HSPI);
     }
+}
+
+void ICACHE_FLASH_ATTR spi_slave_write_data()
+{
+
+}
+
+void ICACHE_FLASH_ATTR spi_slave_read_data()
+{
+
 }
 
 static os_timer_t spi_timer_test;
@@ -192,7 +204,7 @@ void ICACHE_FLASH_ATTR _spi_slave_init()
 
     os_printf("\r\n ============= spi init slave =============\r\n");
     SPIInit(SpiNum_HSPI, &hSpiAttr);
-    
+
     // Set spi interrupt information.
     SpiIntInfo spiInt;
     spiInt.src = (SpiIntSrc_TransDone 
@@ -203,7 +215,7 @@ void ICACHE_FLASH_ATTR _spi_slave_init()
     spiInt.isrFunc = spi_slave_isr_sta;
     SPIIntCfg(SpiNum_HSPI, &spiInt);
    // SHOWSPIREG(SpiNum_HSPI);
-    
+
     SPISlaveRecvData(SpiNum_HSPI);
 #if 0
     uint32_t sndData[8] = { 0 };
@@ -230,7 +242,7 @@ void spi_interface_init(void)
     os_printf("\r\n =======================================================\r\n");
     os_printf("\t ESP8266 %s application \n\r", __func__);
     os_printf("\t\t SDK version:%s    \n\r", system_get_sdk_version());
-    os_printf("\t\t Complie time:%s  \n\r", __TIME__);
+    //os_printf("\t\t Complie time:%s  \n\r", __TIME__);
     os_printf("\r\n =======================================================\r\n");
 
     _spi_slave_init();

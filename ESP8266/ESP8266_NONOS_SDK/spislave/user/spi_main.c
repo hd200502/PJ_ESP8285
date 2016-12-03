@@ -121,6 +121,8 @@ void ICACHE_FLASH_ATTR spi_task(os_event_t *e)
         disp_spi_data(e->par);
 		spi_parse_data(e->par);
         break;
+	case SPI_SIG_MISO:
+		break;
 	case SPI_SIG_STATUS_R_IN_WR :
 		os_printf("SR ERR in WRPR,Reg:%08x \n",e->par);
 		break;
@@ -149,10 +151,7 @@ void ICACHE_FLASH_ATTR spi_task(os_event_t *e)
     }
 }
 
-
 static os_timer_t spi_task_timer;
-
-
 
 #define SPI_QUEUE_LEN 8
 static os_event_t * spiQueue;
@@ -223,7 +222,6 @@ void ICACHE_FLASH_ATTR app_test_spi_cmd_mode_init(void* arg)
 	START_TIMER(spi_task_timer, app_test_spi_cmd_wifi_scan, 3000);
 }
 
-
 void ICACHE_FLASH_ATTR user_init(void)
 {
 	UART_SetBaudrate(0, 74880);
@@ -232,7 +230,7 @@ void ICACHE_FLASH_ATTR user_init(void)
 
 	os_memset(&SpiInfo, 0, sizeof(SpiInfo));
 
-    os_printf("compile time:%s %s %s",__DATE__,__TIME__, __FUNCTION__);
+    //os_printf("compile time:%s %s %s",__DATE__,__TIME__, __FUNCTION__);
     spi_interface_init();
 
 	os_printf("spi task init \n\r");
